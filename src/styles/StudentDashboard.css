@@ -1,0 +1,89 @@
+/* src/styles/StudentDashboard.css */
+
+.dashboard-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f5f5f5; /* Light background similar to the example */
+}
+
+.main-section {
+  width: 70%;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-right: 20px;
+}
+
+.good-job-tile h3 {
+  color: #ff4081; /* Bright pink similar to the example */
+  font-size: 24px;
+}
+
+.good-job-tile p {
+  color: #666666;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.grievance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.grievance-table th, .grievance-table td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.grievance-table th {
+  background-color: #f0f0f0;
+  color: #333;
+  font-weight: bold;
+}
+
+.grievance-table td {
+  color: #555;
+}
+
+.sidebar-section {
+  width: 30%;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+.upcoming-class-tile h3 {
+  color: #333333;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.upcoming-class-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.upcoming-class-list li {
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 15px;
+}
+
+.class-name {
+  font-weight: bold;
+  color: #333333;
+}
+
+.class-time {
+  display: block;
+  color: #999999;
+  font-size: 12px;
+}
