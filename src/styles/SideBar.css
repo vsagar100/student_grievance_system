@@ -1,49 +1,44 @@
 /* src/styles/Sidebar.css */
+
 .sidebar {
-  height: 100vh;
-  background-color: #ffffff;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  color: #333;
-  transition: width 0.3s ease;
-  overflow-y: auto;
   width: 250px;
+  background-color: #ffffff;
+  border-right: 1px solid #ddd;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  overflow-y: auto;
+  transition: width 0.3s ease; /* Transition for width */
+  z-index: 1000;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  padding-top: 20px; /* Padding for better layout */
 }
 
 .sidebar.collapsed {
-  width: 80px;
+  width: 60px; /* Width for collapsed state */
 }
 
 .user-profile {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  padding: 20px;
-  background-color: #f0f0f0;
-  margin-bottom: 20px;
-  border-radius: 8px;
+  padding: 20px 0;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 10px; /* Spacing below profile */
 }
 
-.user-pic {
-  width: 50px;
-  height: 50px;
+.profile-pic {
+  width: 40px; /* Smaller profile pic in collapsed state */
+  height: 40px;
   border-radius: 50%;
-  margin-right: 15px;
+  object-fit: cover;
+  margin-bottom: 10px;
 }
 
 .user-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.user-info h4 {
-  margin: 0;
-  font-size: 16px;
-  color: #333;
-}
-
-.user-info p {
-  margin: 0;
-  font-size: 12px;
-  color: #777;
+  text-align: center;
+  display: block; /* Show user info in expanded state */
 }
 
 .sidebar.collapsed .user-info {
@@ -51,47 +46,54 @@
 }
 
 .sidebar ul {
-  list-style: none; /* Remove bullets */
+  list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
 .sidebar ul li {
-  margin-bottom: 15px;
+  padding: 15px 0; /* Center-align items */
+  border-bottom: 1px solid #eee;
+  text-align: left; /* Align text to the left */
 }
 
 .sidebar ul li a {
-  display: flex;
-  align-items: center;
-  padding: 10px 20px;
-  color: #333;
   text-decoration: none;
+  color: #333;
   font-size: 16px;
-  white-space: nowrap;
-  overflow: hidden; /* Hide overflow text */
-  transition: all 0.3s ease;
-}
-
-.sidebar.collapsed ul li a .hide-menu {
-  display: none; /* Hide text when collapsed */
+  display: flex; /* Use flexbox for icon and text alignment */
+  align-items: center; /* Center align items vertically */
+  justify-content: flex-start; /* Align items to the left */
+  padding-left: 10px; /* Padding to offset text */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transitions */
 }
 
 .sidebar ul li a:hover {
-  background-color: #f0f0f0;
+  background-color: #f0f4f8;
   color: #007bff;
 }
 
-.menu-icon {
-  margin-right: 10px;
+.sidebar ul li a .icon {
   font-size: 18px;
 }
 
-.sidebar.collapsed .menu-icon {
-  margin-right: 0;
-  justify-content: center; /* Center the icon when collapsed */
+.sidebar.collapsed ul li a {
+  justify-content: center; /* Center icons when collapsed */
+  padding-left: 0; /* Remove padding when collapsed */
 }
 
-.sidebar.collapsed ul li a {
-  padding: 10px; /* Adjust padding for icons */
-  justify-content: center;
+.sidebar.collapsed ul li a .icon {
+  margin-right: 0; /* Remove margin in collapsed state */
+}
+
+.sidebar.open ul li a .icon {
+  margin-right: 10px; /* Add margin when expanded */
+}
+
+.sidebar.collapsed ul li a span {
+  display: none; /* Hide text in collapsed state */
+}
+
+.sidebar.open ul li a span {
+  display: inline; /* Show text when expanded */
 }

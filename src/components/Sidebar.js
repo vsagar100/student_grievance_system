@@ -1,57 +1,69 @@
-import React, { useContext } from 'react';
-import '../styles/SideBar.css';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTachometerAlt, faUserGraduate, faBook, faChartLine, faCog } from '@fortawesome/free-solid-svg-icons';
-import UserProfilePic from '../assets/images/admin.jpg'; // Import a sample user profile picture
+import { faHome, faUser, faBook, faBell, faCog, faQuestionCircle } from '@fortawesome/free-solid-svg-icons'; // Example icons
+import '../styles/SideBar.css';
 
-import { SidebarContext } from '../contexts/SidebarContext'; // Import SidebarContext
+const Sidebar = ({ isSidebarOpen, userRole, userName, userProfilePic }) => {
+  let menuItems = [];
 
-const Sidebar = () => {
-  const { isSidebarOpen } = useContext(SidebarContext); // Use context
+  // Define menu items based on user role
+  if (userRole === 'Student') {
+    menuItems = [
+      { path: '/student/dashboard', label: 'Dashboard', icon: faHome },
+      { path: '/student/my-grievances', label: 'My Grievances', icon: faUser },
+      { path: '/student/resources', label: 'Resources', icon: faBook },
+      { path: '/student/profile', label: 'Profile', icon: faUser },
+      { path: '/student/announcements', label: 'Announcements', icon: faBell },
+      { path: '/student/settings', label: 'Settings', icon: faCog },
+      { path: '/student/activities', label: 'Student Activities', icon: faUser },
+      { path: '/student/support', label: 'Support', icon: faQuestionCircle },
+    ];
+  } else if (userRole === 'Staff') {
+    menuItems = [
+      { path: '/staff/dashboard', label: 'Dashboard', icon: faHome },
+      { path: '/staff/assigned-grievances', label: 'Assigned Grievances', icon: faUser },
+      { path: '/staff/manage-profile', label: 'Manage Profile', icon: faUser },
+      { path: '/staff/resources', label: 'Resources', icon: faBook },
+      { path: '/staff/announcements', label: 'Announcements', icon: faBell },
+      { path: '/staff/settings', label: 'Settings', icon: faCog },
+      { path: '/staff/support', label: 'Support', icon: faQuestionCircle },
+    ];
+  } else if (userRole === 'Admin') {
+    menuItems = [
+      { path: '/admin/dashboard', label: 'Dashboard', icon: faHome },
+      { path: '/admin/manage-staff', label: 'Manage Staff', icon: faUser },
+      { path: '/admin/manage-students', label: 'Manage Students', icon: faUser },
+      { path: '/admin/reports', label: 'Reports', icon: faBook },
+      { path: '/admin/resources', label: 'Resources', icon: faBook },
+      { path: '/admin/announcements', label: 'Announcements', icon: faBell },
+      { path: '/admin/settings', label: 'Settings', icon: faCog },
+      { path: '/admin/support', label: 'Support', icon: faQuestionCircle },
+    ];
+  }
 
-//const Sidebar = ({ isSidebarOpen }) => {
   return (
-    <aside className={`sidebar ${isSidebarOpen ? '' : 'collapsed'}`}>
+    <div className={`sidebar ${isSidebarOpen ? 'open' : 'collapsed'}`}>
+      {/* User Profile Section */}
       <div className="user-profile">
-        <img src={UserProfilePic} alt="User" className="user-pic" />
-        <div className={`user-info ${isSidebarOpen ? '' : 'collapsed'}`}>
-          <h4>John Doe</h4>
-          <p>Admin</p>
+        <img src={userProfilePic} alt="User Profile" className="profile-pic" />
+        <div className="user-info">
+          <span className="user-name">{userName}</span>
+          <span className="user-role">{userRole}</span>
         </div>
       </div>
+      {/* Menu Items */}
       <ul>
-        <li>
-          <a href="/student/dashboard" className="menu-top menu-toggle">
-            <FontAwesomeIcon icon={faTachometerAlt} className="menu-icon" />
-            <span className="hide-menu">Dashboard</span>
-          </a>
-        </li>
-        <li>
-          <a href="/admin/users" className="menu-top menu-toggle">
-            <FontAwesomeIcon icon={faUserGraduate} className="menu-icon" />
-            <span className="hide-menu">Students</span>
-          </a>
-        </li>
-        <li>
-          <a href="/admin/courses" className="menu-top menu-toggle">
-            <FontAwesomeIcon icon={faBook} className="menu-icon" />
-            <span className="hide-menu">Courses</span>
-          </a>
-        </li>
-        <li>
-          <a href="/admin/reports" className="menu-top menu-toggle">
-            <FontAwesomeIcon icon={faChartLine} className="menu-icon" />
-            <span className="hide-menu">Reports</span>
-          </a>
-        </li>
-        <li>
-          <a href="/admin/settings" className="menu-top menu-toggle">
-            <FontAwesomeIcon icon={faCog} className="menu-icon" />
-            <span className="hide-menu">Settings</span>
-          </a>
-        </li>
+        {menuItems.map((item, index) => (
+          <li key={index}>
+            <Link to={item.path}>
+              <FontAwesomeIcon icon={item.icon} className="icon" />
+              <span className="menu-label">{item.label}</span>
+            </Link>
+          </li>
+        ))}
       </ul>
-    </aside>
+    </div>
   );
 };
 

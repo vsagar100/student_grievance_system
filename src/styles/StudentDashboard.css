@@ -4,25 +4,33 @@
   display: flex;
   justify-content: space-between;
   padding: 20px;
-  background-color: #f5f5f5; /* Light background similar to the example */
+  background-color: #f0f4f8; /* Slightly off-white background for a soft look */
 }
 
 .main-section {
   width: 70%;
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px; /* Rounded corners for a modern look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   padding: 20px;
   margin-right: 20px;
+  transition: box-shadow 0.3s ease; /* Smooth hover effect */
 }
 
+.main-section:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* Enhanced shadow on hover */
+}
+
+
 .good-job-tile h3 {
-  color: #ff4081; /* Bright pink similar to the example */
-  font-size: 24px;
+  color: #ff4081; /* Bright pink to grab attention */
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 .good-job-tile p {
-  color: #666666;
+  color: #555555;
   font-size: 16px;
   margin-bottom: 20px;
 }
@@ -43,7 +51,7 @@
 }
 
 .grievance-table th {
-  background-color: #f0f0f0;
+  background-color: #f7f7f7; /* Light background for header */
   color: #333;
   font-weight: bold;
 }
@@ -53,17 +61,68 @@
 }
 
 .sidebar-section {
-  width: 30%;
-  background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  width: 28%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Space between tiles */
 }
 
-.upcoming-class-tile h3 {
+.announcements-tile, .quick-links-tile {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover effect */
+}
+
+.announcements-tile:hover, .quick-links-tile:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.announcements-tile h3, .quick-links-tile h3 {
   color: #333333;
   font-size: 20px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+}
+
+.announcements-list, .quick-links-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.announcements-list li, .quick-links-list li {
+  font-size: 14px;
+  color: #666666;
+  margin-bottom: 10px;
+}
+
+.quick-links-list li a {
+  text-decoration: none;
+  color: #007bff;
+  transition: color 0.3s ease; /* Smooth color change */
+}
+
+.quick-links-list li a:hover {
+  color: #0056b3; /* Darker blue on hover */
+}
+
+/* src/styles/StudentDashboard.css */
+
+/* Existing styles... */
+
+.upcoming-class-tile {
+  background-color: #ffffff; /* Consistent background color */
+  border-radius: 12px; /* Rounded corners for a modern look */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  padding: 20px;
+  margin-top: 20px; /* Spacing from other elements */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Hover effect */
+}
+
+.upcoming-class-tile:hover {
+  transform: translateY(-5px); /* Lift effect on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 .upcoming-class-list {
@@ -75,15 +134,18 @@
   font-size: 14px;
   color: #666666;
   margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.class-name {
+.upcoming-class-list li .class-name {
   font-weight: bold;
   color: #333333;
 }
 
-.class-time {
-  display: block;
+.upcoming-class-list li .class-time {
   color: #999999;
   font-size: 12px;
+  text-align: right;
 }

@@ -1,46 +1,65 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Sidebar from './components/Sidebar';
 import StudentDashboard from './components/StudentDashboard';
-import SignIn from './components/SignIn'; // Import your SignIn component
-import SignUp from './components/SignUp';
-import { SidebarContext } from './contexts/SidebarContext'; // Import SidebarContext
-import './styles/App.css';
+import StaffDashboard from './components/StaffDashboard';
+import AdminDashboard from './components/AdminDashboard';
+import SignIn from './components/SignIn';
+import SignUp from './components/SignUp';  
+import { SidebarContext } from './contexts/SidebarContext';
+import './App.css';
 
 function App() {
-  const location = useLocation(); // Get the current location
-  const { isSidebarOpen, toggleSidebar } = useContext(SidebarContext); // Use context
+  const location = useLocation();
+  const { isSidebarOpen, toggleSidebar } = useContext(SidebarContext);
+  
+  const [userRole, setUserRole] = useState('Student'); // Default to Student for testing
+  const [userName, setUserName] = useState('Ashton Cox'); // Example name
+  const [userProfilePic, setUserProfilePic] = useState('https://via.placeholder.com/80'); // Placeholder image
 
-  // Define routes that do not require Sidebar, Header, and Footer
-  const noAuthRoutes = ['/', '/signin', '/signup'];
+  const handleRoleChange = (role) => {
+    setUserRole(role); // Function to update the user role
+  };
+
+  const noAuthRoutes = ['/signin', '/signup', '/terms']; 
 
   return (
-    <div className={`app-container ${noAuthRoutes.includes(location.pathname) ? 'no-sidebar' : ''}`}>
-      {/* Conditionally render Sidebar, Header, and Footer */}
+    <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'}`}>
       {!noAuthRoutes.includes(location.pathname) ? (
         <>
-          <Sidebar isSidebarOpen={isSidebarOpen} />
-          <div className={`main-area ${isSidebarOpen ? '' : 'sidebar-collapsed'}`}>
+          <Sidebar 
+            isSidebarOpen={isSidebarOpen} 
+            userRole={userRole} 
+            userName={userName}
+            userProfilePic={userProfilePic}
+          />
+          <div className="main-area">
             <Header toggleSidebar={toggleSidebar} />
             <div className="main-content">
               <Routes>
-                {/* Routes that require Sidebar, Header, and Footer */}
-                <Route path="/student/dashboard" element={<StudentDashboard />} />
-                {/* Add more routes here */}
+                {userRole === 'Student' && (
+                  <Route path="/student/dashboard" element={<StudentDashboard />} />
+                )}
+                {userRole === 'Staff' && (
+                  <Route path="/staff/dashboard" element={<StaffDashboard />} />
+                )}
+                {userRole === 'Admin' && (
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                )}
+                {/* Add more routes as needed */}
               </Routes>
               <Footer />
             </div>
           </div>
         </>
       ) : (
-        <div className="auth-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100vw', height: '100vh', backgroundColor: '#f8f9fa', position: 'fixed', top: '0', left: '0' }}>
+        <div className="auth-content">
           <Routes>
-            {/* Routes that do not require Sidebar, Header, and Footer */}
-            <Route path="/" element={<SignIn />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} /> {/* Add SignUp route */}
+            <Route path="/signin" element={<SignIn onRoleChange={handleRoleChange} />} />
+            <Route path="/signup" element={<SignUp />} />
+           
           </Routes>
         </div>
       )}

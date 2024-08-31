@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/StudentDashboard.css';
 
-const StaffDashboard = () => {
+const AdminDashboard = () => {
   const [grievances, setGrievances] = useState([]);
 
   // Simulate an API call to fetch grievances
@@ -70,4 +70,4 @@ const StaffDashboard = () => {
   );
 };
 
-export default StaffDashboard;
+export default AdminDashboard;
