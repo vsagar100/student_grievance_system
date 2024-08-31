@@ -1,0 +1,26 @@
+/* src/styles/App.css */
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.sidebar {
+  flex-shrink: 0; /* Prevent shrinking */
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 80px; /* Collapse width */
+}
+
+.main-area {
+  flex-grow: 1; /* Allow main content to take up remaining space */
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  padding: 20px;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}

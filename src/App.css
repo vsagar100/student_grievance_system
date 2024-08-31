@@ -1,0 +1,81 @@
+/*.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+ src/styles/App.css */
+
+/* src/styles/App.css */
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+.no-sidebar {
+  width: 100%; /* Ensures the container takes full width for no-auth routes */
+}
+
+.main-area {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content {
+  padding: 20px;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+
+.auth-content {
+  display: flex; /* Flexbox for alignment */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Center content vertically */
+  width: 100vw; /* Full viewport width */
+  height: 100vh; /* Full viewport height */
+  background-color: #f8f9fa; /* Match main content background */
+  position: fixed; /* Ensure it covers the entire screen */
+  top: 0; /* Aligns the top of the viewport */
+  left: 0; /* Aligns the left of the viewport */
+}
+
+.auth-content > * {
+  max-width: 400px; /* Maximum width for centered content */
+  width: 100%;
+  margin: 0 auto; /* Center the content inside the flexbox */
+}
