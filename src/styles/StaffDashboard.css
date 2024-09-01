@@ -1,0 +1,78 @@
+/* src/styles/StaffDashboard.css */
+
+.staff-dashboard-container {
+  padding: 20px;
+}
+
+.dashboard-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.widget-container {
+  display: flex;
+  flex: 1;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.widget {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  text-align: center;
+}
+
+.widget h3 {
+  margin-bottom: 10px;
+}
+
+.grievance-table-container {
+  flex: 1;
+}
+
+.grievance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.grievance-table th,
+.grievance-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+.grievance-table th {
+  background-color: #f0f0f0;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+
+.pagination button {
+  padding: 5px 10px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.pagination button.active,
+.pagination button:hover {
+  background-color: #0056b3;
+}

@@ -23,7 +23,7 @@ function App() {
     setUserRole(role); // Function to update the user role
   };
 
-  const noAuthRoutes = ['/signin', '/signup', '/terms']; 
+  const noAuthRoutes = ['/signin', '/signup']; 
 
   return (
     <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'}`}>

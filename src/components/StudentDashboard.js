@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import Modal from './Modal'; // Import the Modal component
 import '../styles/StudentDashboard.css';
 
 const StudentDashboard = () => {
   const [grievances, setGrievances] = useState([]);
+  const [showGrievanceModal, setShowGrievanceModal] = useState(false); // State for modal visibility
 
   useEffect(() => {
     const fetchGrievances = () => {
@@ -17,12 +19,52 @@ const StudentDashboard = () => {
     fetchGrievances();
   }, []);
 
+  const handleOpenGrievanceModal = () => setShowGrievanceModal(true); // Function to open the modal
+  const handleCloseGrievanceModal = () => setShowGrievanceModal(false); // Function to close the modal
+
+  const handleGrievanceSubmit = (e) => {
+    e.preventDefault();
+    // Logic to handle grievance submission can go here
+    handleCloseGrievanceModal();
+  };
+
   return (
     <div className="dashboard-container">
       <div className="main-section">
         <div className="good-job-tile">
           <h3>Good Job, Sarah. Keep Going!!</h3>
           <p>Your tasks are 80% completed this week. Keep it up and improve your result. Progress is very good!!!</p>
+          {/* Submit Grievance Button Banner */}
+          <div className="submit-grievance-banner">
+            <button className="submit-grievance-button" onClick={handleOpenGrievanceModal}>
+              Submit Grievance
+            </button>
+          </div>
+          
+          {/* Grievance Modal */}
+          <Modal show={showGrievanceModal} handleClose={handleCloseGrievanceModal} title="Submit Grievance">
+            <form onSubmit={handleGrievanceSubmit}>
+              <div className="form-group">
+                <label htmlFor="category">Category:</label>
+                <select id="category" className="form-control">
+                  <option value="Academic">Academic</option>
+                  <option value="Administration">Administration</option>
+                  <option value="Facilities">Facilities</option>
+                  {/* Add more options as needed */}
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="description">Description:</label>
+                <textarea id="description" className="form-control" rows="4" placeholder="Describe your grievance"></textarea>
+              </div>
+              <div className="form-group">
+                <label htmlFor="fileUpload">Attach File:</label>
+                <input type="file" id="fileUpload" className="form-control-file" />
+              </div>
+              <button type="submit" className="btn btn-primary">Submit</button>
+            </form>
+          </Modal>
+          
           <table className="grievance-table">
             <thead>
               <tr>
