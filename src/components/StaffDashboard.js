@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import Modal from './Modal'; // Assuming you might need modals in the future
+import Modal from './Modal'; // Import the Modal component
 import '../styles/StaffDashboard.css';
 
 const StaffDashboard = () => {
   const [grievances, setGrievances] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const grievancesPerPage = 5;
+  const [showGrievanceModal, setShowGrievanceModal] = useState(false); // State for modal visibility
+  const [selectedGrievance, setSelectedGrievance] = useState(null); // State for selected grievance
 
   useEffect(() => {
     const fetchGrievances = () => {
-      // Dummy grievances data, replace with real API call
       const dummyGrievances = [
         { id: 1, category: 'Academic', description: 'Issue with syllabus', status: 'Pending' },
         { id: 2, category: 'Administration', description: 'Problem with admin staff', status: 'Resolved' },
         { id: 3, category: 'Facilities', description: 'Broken chair in classroom', status: 'In Progress' },
-        { id: 4, category: 'Academic', description: 'Late grade submission', status: 'Pending' },
-        { id: 5, category: 'Administration', description: 'Lost student ID', status: 'Resolved' },
-        { id: 6, category: 'Facilities', description: 'Air conditioning not working', status: 'Pending' },
-        // Add more as needed
       ];
       setGrievances(dummyGrievances);
     };
@@ -25,70 +20,104 @@ const StaffDashboard = () => {
     fetchGrievances();
   }, []);
 
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const handleOpenGrievanceModal = (grievance) => {
+    setSelectedGrievance(grievance); // Set the selected grievance
+    setShowGrievanceModal(true); // Open the modal
+  };
 
-  // Calculate the current grievances to display
-  const indexOfLastGrievance = currentPage * grievancesPerPage;
-  const indexOfFirstGrievance = indexOfLastGrievance - grievancesPerPage;
-  const currentGrievances = grievances.slice(indexOfFirstGrievance, indexOfLastGrievance);
+  const handleCloseGrievanceModal = () => {
+    setShowGrievanceModal(false); // Close the modal
+    setSelectedGrievance(null); // Clear the selected grievance
+  };
+
+  const handleGrievanceSubmit = (e) => {
+    e.preventDefault();
+    // Logic to handle grievance submission can go here
+    handleCloseGrievanceModal();
+  };
 
   return (
-    <div className="staff-dashboard-container">
-      <div className="dashboard-header">
-        <h2>Welcome to the Staff Dashboard</h2>
-      </div>
-
-      <div className="dashboard-content">
-        <div className="widget-container">
-          {/* Widgets for quick stats */}
-          <div className="widget">
-            <h3>Pending Grievances</h3>
-            <p>3</p>
-          </div>
-          <div className="widget">
-            <h3>Resolved Grievances</h3>
-            <p>2</p>
-          </div>
-          <div className="widget">
-            <h3>Recent Notifications</h3>
-            <p>Check your notifications for updates</p>
-          </div>
+    <div className="dashboard-container">
+      <div className="main-section">
+        <div className="staff-overview-tile">
+          <h3>Welcome to the Staff Dashboard</h3>
+          <p>Manage and address grievances efficiently to maintain a positive educational environment.</p>
         </div>
-
-        <div className="grievance-table-container">
-          <h3>Assigned Grievances</h3>
-          <table className="grievance-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Category</th>
-                <th>Description</th>
-                <th>Status</th>
+        
+        {/* Grievance Management Table */}
+        <table className="grievance-table">
+          <thead>
+            <tr>
+              <th>Grievance ID</th>
+              <th>Category</th>
+              <th>Description</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {grievances.map((grievance) => (
+              <tr key={grievance.id}>
+                <td>{grievance.id}</td>
+                <td>{grievance.category}</td>
+                <td>{grievance.description}</td>
+                {/* Add hyperlink to open modal */}
+                <td>
+                  <a href="#" onClick={() => handleOpenGrievanceModal(grievance)}>
+                    {grievance.status}
+                  </a>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {currentGrievances.map((grievance) => (
-                <tr key={grievance.id}>
-                  <td>{grievance.id}</td>
-                  <td>{grievance.category}</td>
-                  <td>{grievance.description}</td>
-                  <td>{grievance.status}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {/* Pagination */}
-          <div className="pagination">
-            {Array.from({ length: Math.ceil(grievances.length / grievancesPerPage) }, (_, index) => (
-              <button
-                key={index}
-                className={index + 1 === currentPage ? 'active' : ''}
-                onClick={() => handlePageChange(index + 1)}
-              >
-                {index + 1}
-              </button>
             ))}
-          </div>
+          </tbody>
+        </table>
+        
+        {/* Grievance Modal */}
+        {selectedGrievance && (
+          <Modal show={showGrievanceModal} handleClose={handleCloseGrievanceModal} title="Manage Grievance">
+            <form onSubmit={handleGrievanceSubmit}>
+              <div className="form-group">
+                <label htmlFor="status">Update Status:</label>
+                <select id="status" className="form-control" defaultValue={selectedGrievance.status}>
+                  <option value="Pending">Pending</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label htmlFor="notes">Notes:</label>
+                <textarea
+                  id="notes"
+                  className="form-control"
+                  rows="4"
+                  placeholder="Add any notes or comments"
+                  defaultValue={selectedGrievance.description}
+                ></textarea>
+              </div>
+              <button type="submit" className="btn btn-primary">Update</button>
+            </form>
+          </Modal>
+        )}
+      </div>
+      
+      <div className="sidebar-section">
+        {/* Announcements Section */}
+        <div className="announcements-tile">
+          <h3>Announcements & Notifications</h3>
+          <ul className="announcements-list">
+            <li>Staff meeting scheduled for 10th July.</li>
+            <li>New guidelines for student grievances handling are now available.</li>
+            <li>Update your profiles with the latest contact details.</li>
+          </ul>
+        </div>
+        
+        {/* Task Section */}
+        <div className="tasks-tile">
+          <h3>Assigned Tasks</h3>
+          <ul className="tasks-list">
+            <li>Review new grievances from students.</li>
+            <li>Prepare monthly report on resolved grievances.</li>
+            <li>Update the admin team on recent issues.</li>
+          </ul>
         </div>
       </div>
     </div>

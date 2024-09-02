@@ -1,47 +1,50 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { useNavigate } from 'react-router-dom';
 import '../styles/SignIn.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 
-const SignIn = () => {
+const SignIn = ({ onRoleChange }) => {
   const [role, setRole] = useState('Student');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-
-  const navigate = useNavigate(); // Hook to navigate programmatically
+  const navigate = useNavigate();
 
   const handleRoleChange = (newRole) => {
     setRole(newRole);
-  };
-
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
+    if (onRoleChange) onRoleChange(newRole); // Update role if callback is provided
   };
 
   const handleSignIn = (e) => {
     e.preventDefault();
-    // Placeholder for API call to validate user credentials
-    if (email === 'std@abc.com' && password === 'pwd123') {
-      // Navigate to the student dashboard if role is 'Student'
+    // Hardcoded credentials for testing
+    const credentials = {
+      Student: { email: 'student@abc.com', password: 'student123' },
+      Staff: { email: 'staff@abc.com', password: 'staff123' },
+      Admin: { email: 'admin@abc.com', password: 'admin123' }
+    };
+
+    if (
+      email === credentials[role].email &&
+      password === credentials[role].password
+    ) {
+      // Redirect based on the role
       if (role === 'Student') {
         navigate('/student/dashboard');
+      } else if (role === 'Staff') {
+        navigate('/staff/dashboard');
+      } else if (role === 'Admin') {
+        navigate('/admin/dashboard');
       }
-      // Additional conditions can be added here for Admin and Teacher roles
     } else {
-      setError('Invalid email or password');
+      alert('Invalid email or password');
     }
   };
 
   return (
     <div className="signin-container">
-      <h1 className="main-heading">Grievance System</h1> {/* Main heading */}
-      <h2 className="sub-heading">Sign In</h2> {/* Sub heading */}
+      <h1 className="main-heading">Grievance System</h1>
+      <h2 className="sub-heading">Sign In</h2>
       <div className="role-selection">
         <button
           className={`role-button ${role === 'Admin' ? 'active' : ''}`}
@@ -56,10 +59,10 @@ const SignIn = () => {
           Student
         </button>
         <button
-          className={`role-button ${role === 'Teacher' ? 'active' : ''}`}
-          onClick={() => handleRoleChange('Teacher')}
+          className={`role-button ${role === 'Staff' ? 'active' : ''}`}
+          onClick={() => handleRoleChange('Staff')}
         >
-          Teacher
+          Staff
         </button>
       </div>
       <form onSubmit={handleSignIn}>
@@ -71,8 +74,7 @@ const SignIn = () => {
               className="form-control"
               placeholder="Email"
               value={email}
-              onChange={handleEmailChange}
-              required
+              onChange={(e) => setEmail(e.target.value)}
             />
           </div>
         </div>
@@ -84,8 +86,7 @@ const SignIn = () => {
               className="form-control"
               placeholder="Password"
               value={password}
-              onChange={handlePasswordChange}
-              required
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
         </div>
@@ -94,10 +95,13 @@ const SignIn = () => {
             <input type="checkbox" />
             Remember me
           </label>
-          <a href="#" className="forgot-password">Forgot Password?</a>
+          <a href="#" className="forgot-password">
+            Forgot Password?
+          </a>
         </div>
-        {error && <p className="error">{error}</p>} {/* Display error message */}
-        <button type="submit" className="btn btn-primary">Sign In</button>
+        <button type="submit" className="btn btn-primary">
+          Sign In
+        </button>
       </form>
     </div>
   );

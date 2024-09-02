@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Sidebar from './components/Sidebar';
@@ -7,15 +7,15 @@ import StudentDashboard from './components/StudentDashboard';
 import StaffDashboard from './components/StaffDashboard';
 import AdminDashboard from './components/AdminDashboard';
 import SignIn from './components/SignIn';
-import SignUp from './components/SignUp';  
+import SignUp from './components/SignUp';
 import { SidebarContext } from './contexts/SidebarContext';
 import './App.css';
 
 function App() {
   const location = useLocation();
   const { isSidebarOpen, toggleSidebar } = useContext(SidebarContext);
-  
-  const [userRole, setUserRole] = useState('Student'); // Default to Student for testing
+
+  const [userRole, setUserRole] = useState(null); // Start with no role to check login
   const [userName, setUserName] = useState('Ashton Cox'); // Example name
   const [userProfilePic, setUserProfilePic] = useState('https://via.placeholder.com/80'); // Placeholder image
 
@@ -23,15 +23,15 @@ function App() {
     setUserRole(role); // Function to update the user role
   };
 
-  const noAuthRoutes = ['/signin', '/signup']; 
+  const noAuthRoutes = ['/signin', '/signup'];
 
   return (
     <div className={`app-container ${isSidebarOpen ? 'sidebar-open' : 'sidebar-collapsed'}`}>
       {!noAuthRoutes.includes(location.pathname) ? (
         <>
-          <Sidebar 
-            isSidebarOpen={isSidebarOpen} 
-            userRole={userRole} 
+          <Sidebar
+            isSidebarOpen={isSidebarOpen}
+            userRole={userRole}
             userName={userName}
             userProfilePic={userProfilePic}
           />
@@ -47,8 +47,11 @@ function App() {
                 )}
                 {userRole === 'Admin' && (
                   <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                )}
-                {/* Add more routes as needed */}
+                )}                
+                {/* Redirect root path to sign-in */}
+                <Route path="/" element={<Navigate to="/signin" />} />
+                {/* Redirect undefined role to sign-in */}
+                <Route path="*" element={<Navigate to="/signin" />} />
               </Routes>
               <Footer />
             </div>
@@ -58,8 +61,8 @@ function App() {
         <div className="auth-content">
           <Routes>
             <Route path="/signin" element={<SignIn onRoleChange={handleRoleChange} />} />
+            <Route path="/signin" element={<SignIn onRoleChange={handleRoleChange} />} />
             <Route path="/signup" element={<SignUp />} />
-           
           </Routes>
         </div>
       )}
