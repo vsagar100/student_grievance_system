@@ -1,23 +1,23 @@
+// SignIn.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/SignIn.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
 
-  const SignIn = ({ onRoleChange }) => {
-  const [role, setRole] = useState('student');
+const SignIn = ({ onRoleChange, onUserDetailsChange }) => {
+  const [role, setRole] = useState('student'); // Default to 'student'
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
   const handleRoleChange = (newRole) => {
     setRole(newRole.toLowerCase());
-    if (onRoleChange) onRoleChange(newRole.toLowerCase()); // Update role if callback is provided
+    if (onRoleChange) onRoleChange(newRole.toLowerCase());
   };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    //navigate(`/${role.toLowerCase()}/dashboard`);
     try {
       const response = await fetch('http://vm-ae-mvn-ubn22.australiaeast.cloudapp.azure.com:5000/api/auth/signin', {
         method: 'POST',
@@ -26,9 +26,10 @@ import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
       });
 
       const data = await response.json();
-      console.log(data);
       if (data.status === 'success') {
-        console.log(`Navigation to dashboard: /${role.toLowerCase()}/dashboard` ); // Debug log
+        const role = data.user.role.charAt(0).toUpperCase() + data.user.role.slice(1); // Camel-case role
+        onRoleChange(role); // Update role based on response
+        onUserDetailsChange(data.user.username, 'https://via.placeholder.com/80'); // Example profile pic URL
         navigate(`/${role.toLowerCase()}/dashboard`);
       } else {
         alert(data.message);
@@ -45,23 +46,23 @@ import { faUser, faLock } from '@fortawesome/free-solid-svg-icons';
       <h2 className="sub-heading">Sign In</h2>
       <div className="role-selection">
         <button
-          className={`role-button ${role === 'Admin' ? 'active' : ''}`}
-          onClick={() => handleRoleChange('Admin')}
+          className={`role-button ${role === 'admin' ? 'active' : ''}`}
+          onClick={() => handleRoleChange('admin')}
         >
           Admin
         </button>
         <button
-          className={`role-button ${role === 'Student' ? 'active' : ''}`}
-          onClick={() => handleRoleChange('Student')}
+          className={`role-button ${role === 'student' ? 'active' : ''}`}
+          onClick={() => handleRoleChange('student')}
         >
           Student
         </button>
         <button
-          className={`role-button ${role === 'Staff' ? 'active' : ''}`}
-          onClick={() => handleRoleChange('Staff')}
+          className={`role-button ${role === 'staff' ? 'active' : ''}`}
+          onClick={() => handleRoleChange('staff')}
         >
           Staff
-        </button>        
+        </button>
       </div>
       <form onSubmit={handleSignIn}>
         <div className="form-group">

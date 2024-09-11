@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import Modal from './Modal'; // Import the Modal component
+import SubmitGrievance from './SubmitGrievance'; // Import the SubmitGrievance component
 import '../styles/StudentDashboard.css';
 
 const StudentDashboard = () => {
   const [grievances, setGrievances] = useState([]);
   const [showGrievanceModal, setShowGrievanceModal] = useState(false); // State for modal visibility
 
+ // Fetch grievances from the backend API
   useEffect(() => {
-    const fetchGrievances = () => {
-      const dummyGrievances = [
-        { id: 1, category: 'Academic', description: 'Issue with grading', status: 'Pending' },
-        { id: 2, category: 'Administration', description: 'Delay in issuing certificates', status: 'Resolved' },
-        { id: 3, category: 'Facilities', description: 'Maintenance required in library', status: 'In Progress' },
-      ];
-      setGrievances(dummyGrievances);
+    const fetchGrievances = async () => {
+      try {
+        const response = await fetch('http://vm-ae-mvn-ubn22.australiaeast.cloudapp.azure.com:5000/api/grievances/get/all'); // Update with your backend URL
+        if (!response.ok) {
+          throw new Error('Failed to fetch grievances');
+        }
+        const data = await response.json();
+        setGrievances(data);
+      } catch (err) {
+        setError('Error fetching grievances: ' + err.message);
+      }
     };
 
     fetchGrievances();
@@ -22,10 +28,17 @@ const StudentDashboard = () => {
   const handleOpenGrievanceModal = () => setShowGrievanceModal(true); // Function to open the modal
   const handleCloseGrievanceModal = () => setShowGrievanceModal(false); // Function to close the modal
 
-  const handleGrievanceSubmit = (e) => {
-    e.preventDefault();
-    // Logic to handle grievance submission can go here
-    handleCloseGrievanceModal();
+  const handleGrievanceSubmit = (grievanceData) => {
+    // Handle the grievance submission (API call or local state update)
+    console.log('Grievance submitted:', grievanceData);
+    // Update the grievance list (optional, based on API response)
+    const newGrievance = {
+      id: grievances.length + 1, // Temporary ID for the new grievance
+      category: grievanceData.category,
+      description: grievanceData.description,
+      status: 'Submitted', // Default status
+    };
+    setGrievances([...grievances, newGrievance]);
   };
 
   return (
@@ -40,31 +53,16 @@ const StudentDashboard = () => {
               Submit Grievance
             </button>
           </div>
-          
+
           {/* Grievance Modal */}
           <Modal show={showGrievanceModal} handleClose={handleCloseGrievanceModal} title="Submit Grievance">
-            <form onSubmit={handleGrievanceSubmit}>
-              <div className="form-group">
-                <label htmlFor="category">Category:</label>
-                <select id="category" className="form-control">
-                  <option value="Academic">Academic</option>
-                  <option value="Administration">Administration</option>
-                  <option value="Facilities">Facilities</option>
-                  {/* Add more options as needed */}
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="description">Description:</label>
-                <textarea id="description" className="form-control" rows="4" placeholder="Describe your grievance"></textarea>
-              </div>
-              <div className="form-group">
-                <label htmlFor="fileUpload">Attach File:</label>
-                <input type="file" id="fileUpload" className="form-control-file" />
-              </div>
-              <button type="submit" className="btn btn-primary">Submit</button>
-            </form>
+            {/* Render the SubmitGrievance component inside the modal */}
+            <SubmitGrievance
+              onSubmit={handleGrievanceSubmit}
+              handleClose={handleCloseGrievanceModal}
+            />
           </Modal>
-          
+
           <table className="grievance-table">
             <thead>
               <tr>

@@ -39,7 +39,7 @@
 }
 
 .footer {
-  margin-left: 250px; /* Default margin to accommodate the sidebar */
+/*  margin-left: 250px; /* Default margin to accommodate the sidebar */
   transition: margin-left 0.3s ease; /* Smooth transition for sidebar toggle */
 }
 

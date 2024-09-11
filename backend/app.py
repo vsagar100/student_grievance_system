@@ -1,8 +1,9 @@
-from flask import Flask, jsonify  
+from flask import Flask, jsonify, g  
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+
 
 db = SQLAlchemy()
 bcrypt = Bcrypt()
@@ -26,6 +27,16 @@ def create_app():
         # Import the blueprint inside the function
         from routes.auth import auth_bp
         app.register_blueprint(auth_bp, url_prefix='/api/auth')
+    
+    with app.app_context():
+        # Import the blueprint inside the function
+        from routes.submit_grievance import submit_grievance_bp
+        app.register_blueprint(submit_grievance_bp, url_prefix='/api/grievance')
+
+    with app.app_context():
+        # Import the blueprint inside the function
+        from routes.get_grievances import get_grievances_bp
+        app.register_blueprint(get_grievances_bp, url_prefix='/api/grievances')
 
     return app
 

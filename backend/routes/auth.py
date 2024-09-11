@@ -20,7 +20,7 @@ def signin():
             return jsonify({"status": "error", "message": "Email and password are required"}), 400
 
         user = User.query.filter_by(email=email).first()
-        print(f"{user.password:<20}")
+        #print(f"{user.password:<20}")
         #print(f"{generate_password_hash(password).decode('utf-8')}")
         if not user:            
             return jsonify({"status": "error", "message": "Invalid email or password"}), 401
