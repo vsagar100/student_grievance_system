@@ -1,66 +1,117 @@
-import React, { useState, useEffect } from 'react';
-import Modal from './Modal'; // Import the Modal component
-import SubmitGrievance from './SubmitGrievance'; // Import the SubmitGrievance component
+import React, { useState, useEffect, useContext } from 'react';
+import { GlobalContext } from '../GlobalState';
+import SubmitGrievance from './SubmitGrievance';
+import Modal from './Modal';
+import FeedbackModal from './FeedbackModal';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEye, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import '../styles/StudentDashboard.css';
 
 const StudentDashboard = () => {
+  const { BACKEND_API_URL } = useContext(GlobalContext);
   const [grievances, setGrievances] = useState([]);
-  const [showGrievanceModal, setShowGrievanceModal] = useState(false); // State for modal visibility
+  const [showGrievanceModal, setShowGrievanceModal] = useState(false);
+  const [showViewGrievanceModal, setShowViewGrievanceModal] = useState(false);
+  const [selectedGrievance, setSelectedGrievance] = useState(null);
+  const [error, setError] = useState(null);
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [feedback, setFeedback] = useState({ show: false, type: '', message: '' });
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 5;
 
- // Fetch grievances from the backend API
-  useEffect(() => {
-    const fetchGrievances = async () => {
-      try {
-        const response = await fetch('http://vm-ae-mvn-ubn22.australiaeast.cloudapp.azure.com:5000/api/grievances/get/all'); // Update with your backend URL
-        if (!response.ok) {
-          throw new Error('Failed to fetch grievances');
-        }
-        const data = await response.json();
-        setGrievances(data);
-      } catch (err) {
-        setError('Error fetching grievances: ' + err.message);
-      }
-    };
-
-    fetchGrievances();
-  }, []);
-
-  const handleOpenGrievanceModal = () => setShowGrievanceModal(true); // Function to open the modal
-  const handleCloseGrievanceModal = () => setShowGrievanceModal(false); // Function to close the modal
-
-  const handleGrievanceSubmit = (grievanceData) => {
-    // Handle the grievance submission (API call or local state update)
-    console.log('Grievance submitted:', grievanceData);
-    // Update the grievance list (optional, based on API response)
-    const newGrievance = {
-      id: grievances.length + 1, // Temporary ID for the new grievance
-      category: grievanceData.category,
-      description: grievanceData.description,
-      status: 'Submitted', // Default status
-    };
-    setGrievances([...grievances, newGrievance]);
+  // Function to close feedback modal
+  const handleCloseFeedback = () => {
+    setFeedback({ show: false, type: '', message: '' });
   };
+
+  // Fetch grievances from the backend API
+  const fetchGrievances = async () => {
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/api/grievances/get/all`);
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Response is not JSON');
+      }
+      const data = await response.json();
+      setGrievances(data);
+    } catch (err) {
+      console.error('Error fetching grievances:', err);
+      setError('Error fetching grievances: ' + err.message);
+      showFeedback('error', 'Error fetching grievances: ' + err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchGrievances();
+  }, [BACKEND_API_URL]);
+
+  // Handle grievance submission
+  const handleGrievanceSubmit = async (formData) => {
+    setError(null);
+    setMessage('');
+    try {
+      const response = await fetch(`${BACKEND_API_URL}/api/grievance/submit`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        setMessage('Grievance submitted successfully!');
+        setShowGrievanceModal(false);
+        fetchGrievances();
+        showFeedback('success', 'Grievance submitted successfully!');
+      } else {
+        throw new Error(result.message || 'An error occurred while submitting the grievance');
+      }
+    } catch (err) {
+      setError('An error occurred: ' + err.message);
+      showFeedback('error', 'An error occurred: ' + err.message);
+    }
+  };
+
+   const handleViewGrievance = async (grievanceId) => {
+    setIsLoading(true);
+    setError(null); // Clear previous errors
+    const grievance = grievances.find(g => g.id === grievanceId); // Find the selected grievance
+    console.log('Selected Grievance:', grievance);
+    if (grievance) {
+      setSelectedGrievance(grievance); // Set the selected grievance
+      setShowViewGrievanceModal(true); // Show the modal
+    } else {
+      setError('Grievance not found');
+      showFeedback('error', 'Grievance not found.'); // Show error feedback
+    }
+
+    setIsLoading(false); // Stop loading
+  };
+  
+  // Close modal handleCloseViewGrievanceModal
+  const handleCloseViewGrievanceModal = () => {
+    setShowViewGrievanceModal(false); // Close the modal
+    setSelectedGrievance(null); // Reset selected grievance
+  };
+
+  const showFeedback = (type, message) => {
+    setFeedback({ show: true, type, message });
+  };
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const currentRecords = grievances.slice((currentPage - 1) * recordsPerPage, currentPage * recordsPerPage);
 
   return (
     <div className="dashboard-container">
       <div className="main-section">
         <div className="good-job-tile">
           <h3>Good Job, Sarah. Keep Going!!</h3>
-          <p>Your tasks are 80% completed this week. Keep it up and improve your result. Progress is very good!!!</p>
-          {/* Submit Grievance Button Banner */}
-          <div className="submit-grievance-banner">
-            <button className="submit-grievance-button" onClick={handleOpenGrievanceModal}>
-              Submit Grievance
-            </button>
-          </div>
+          <p>Your tasks are 80% completed this week. Progress is very good!!!</p>
+          <button className="submit-grievance-button" onClick={() => setShowGrievanceModal(true)}>
+            Submit Grievance
+          </button>
 
-          {/* Grievance Modal */}
-          <Modal show={showGrievanceModal} handleClose={handleCloseGrievanceModal} title="Submit Grievance">
-            {/* Render the SubmitGrievance component inside the modal */}
-            <SubmitGrievance
-              onSubmit={handleGrievanceSubmit}
-              handleClose={handleCloseGrievanceModal}
-            />
+          <Modal show={showGrievanceModal} handleClose={() => setShowGrievanceModal(false)} title="Submit Grievance">
+            <SubmitGrievance onSubmit={handleGrievanceSubmit} handleClose={() => setShowGrievanceModal(false)} />
           </Modal>
 
           <table className="grievance-table">
@@ -70,50 +121,91 @@ const StudentDashboard = () => {
                 <th>Category</th>
                 <th>Description</th>
                 <th>Status</th>
+                <th>View</th>
               </tr>
             </thead>
             <tbody>
-              {grievances.map((grievance) => (
-                <tr key={grievance.id}>
-                  <td>{grievance.id}</td>
-                  <td>{grievance.category}</td>
-                  <td>{grievance.description}</td>
-                  <td>{grievance.status}</td>
+              {isLoading ? (
+                <tr>
+                  <td colSpan="5">
+                    <div className="spinner"></div>
+                  </td>
                 </tr>
-              ))}
+              ) : (
+                currentRecords.map((grievance) => (
+                  <tr key={grievance.id}>
+                    <td>{grievance.id}</td>
+                    <td>{grievance.category}</td>
+                    <td>{grievance.description}</td>
+                    <td>
+                      <FontAwesomeIcon
+                        icon={grievance.status === 'submitted' ? faCheckCircle : faTimesCircle}
+                        className={`status-icon ${grievance.status === 'submitted' ? 'status-open' : 'status-closed'}`}
+                      />
+                      {grievance.status}
+                    </td>
+                    <td>
+                      <button onClick={() => handleViewGrievance(grievance.id)}>
+                        <FontAwesomeIcon icon={faEye} className="view-icon" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
+
+          <div className="pagination">
+            {[...Array(Math.ceil(grievances.length / recordsPerPage)).keys()].map((number) => (
+              <button key={number} onClick={() => paginate(number + 1)}>
+                {number + 1}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
+
+      {/* Sidebar Section */}
       <div className="sidebar-section">
-        {/* Announcements and Notifications Section */}
         <div className="announcements-tile">
           <h3>Announcements & Notifications</h3>
           <ul className="announcements-list">
-            <li>New grading policy effective from next semester.</li>
+            <li>New grading policy effective next semester.</li>
             <li>Library will be closed for maintenance on 5th July.</li>
             <li>Submit your assignments by the end of this month.</li>
           </ul>
         </div>
-        {/* Updated Upcoming Class Section */}
-        <div className="upcoming-class-tile">
-          <h3>Upcoming Class</h3>
-          <ul className="upcoming-class-list">
-            <li>
-              <span className="class-name">Cara Stevens</span>
-              <span className="class-time">Mathematics - 12 June '20, 09:00-10:00</span>
-            </li>
-            <li>
-              <span className="class-name">Airi Satou</span>
-              <span className="class-time">Computer Studies - 13 June '20, 11:00-12:00</span>
-            </li>
-            <li>
-              <span className="class-name">Jens Brincker</span>
-              <span className="class-time">Geography - 15 June '20, 09:30-10:30</span>
-            </li>
+
+        {/* Re-added Upcoming Events */}
+        <div className="events-tile">
+          <h3>Upcoming Events</h3>
+          <ul className="events-list">
+            <li>Student Workshop on AI - 12th July</li>
+            <li>Career Counseling Session - 15th July</li>
+            <li>Annual Sports Meet - 20th July</li>
           </ul>
         </div>
       </div>
+      
+      <Modal show={showViewGrievanceModal} handleClose={handleCloseViewGrievanceModal} title="View Grievance">
+      {selectedGrievance ? (
+        <div className="grievance-details">
+          <p><strong>ID:</strong> {selectedGrievance.id}</p>
+          <p><strong>Category:</strong> {selectedGrievance.category}</p>
+          <p><strong>Description:</strong> {selectedGrievance.description}</p>
+          <p><strong>Status:</strong> {selectedGrievance.status}</p>
+        </div>
+      ) : (
+        <p>Loading grievance details...</p>
+      )}
+    </Modal>
+
+      <FeedbackModal
+        show={feedback.show}
+        handleClose={handleCloseFeedback}
+        type={feedback.type}
+        message={feedback.message}
+      />
     </div>
   );
 };

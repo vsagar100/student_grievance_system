@@ -7,6 +7,8 @@ from models import db, Grievance
 import uuid
 import datetime  # For setting created_date and modified_date
 
+from notifications import send_notification
+
 submit_grievance_bp = Blueprint('submit_grievance', __name__)
 
 # Path for saving uploads
@@ -36,21 +38,49 @@ def analyze_sentiment(description):
         return 'neutral'
 
 # Function to auto-set the priority based on the issue description's sentiment
-def set_priority_based_on_sentiment(sentiment):
-    if sentiment == 'negative':
-        return 'high'
-    elif sentiment == 'neutral':
-        return 'medium'
+def set_priority_based_on_sentiment(description):
+    blob = TextBlob(description)
+    polarity = blob.sentiment.polarity
+
+    # Assign priority based on polarity
+    if polarity < -0.5:
+        return "high"
+    elif -0.5 <= polarity <= 0.1:
+        return "medium"
     else:
-        return 'low'
+        return "low"
+        
+# Function to categorize grievance description
+def categorize_grievance(description):
+    # Define keywords for each category
+    academic_keywords = ['professor', 'lecture', 'exam', 'course', 'assignment', 'class']
+    facilities_keywords = ['hostel', 'lab', 'canteen', 'library', 'wifi', 'water', 'electricity']
+    administration_keywords = ['admission', 'registration', 'fee', 'scholarship', 'staff', 'administration']
+
+    # Convert description to lowercase for easier comparison
+    description_lower = description.lower()
+
+    # Check for keywords and assign category
+    if any(word in description_lower for word in academic_keywords):
+        return "Academic"
+    elif any(word in description_lower for word in facilities_keywords):
+        return "Facilities"
+    elif any(word in description_lower for word in administration_keywords):
+        return "Administration"
+    else:
+        return "General"
+
+
 
 @submit_grievance_bp.route('/submit', methods=['POST'])
 def submit_grievance():
     try:
         # Get form data
-        category = request.form.get('category')
+        
         description = request.form.get('description')
         student_id = request.form.get('student_id')
+
+        category = categorize_grievance(description)  #request.form.get('category')
 
         # Default status - initially setting to 'submitted'
         status = 'submitted'
@@ -59,7 +89,7 @@ def submit_grievance():
         sentiment = analyze_sentiment(description)
 
         # Automatically set priority based on sentiment
-        priority = set_priority_based_on_sentiment(sentiment)  # chatGPT to set based on sentiment
+        priority = set_priority_based_on_sentiment(description)
 
         # Set system user ID (for demo purposes, let's assume it's hardcoded)
         gbl_system_user_id = current_app.config['SYSTEM_USER_ID'] #g.get('SYSTEM_USER_ID', 'Default Value')
@@ -99,8 +129,19 @@ def submit_grievance():
         # Save grievance to the database
         db.session.add(grievance)
         db.session.commit()
+        
+        grievance_id = grievance.grievance_id
+        user_id = student_id
+        notification_message = f"Your grievance (ID: {grievance_id}) has been successfully submitted."
+        
+        # Send email notification (for now, we simulate it)
+        if not send_notification(user_id=user_id, grievance_id=grievance_id, message=notification_message, notification_type='email'):
+            raise Exception("Failed to send notification")
 
-        return jsonify({'status': 'success', 'message': 'Grievance submitted successfully', 'sentiment': sentiment, 'priority': priority, 'status': status, 'created_by': created_by, 'created_date': created_date, 'modified_by': modified_by, 'modified_date': modified_date, 'file_path': file_path}), 200
+
+        return jsonify({'status': 'success', 'message': 'Grievance submitted successfully', 'sentiment': sentiment, 'priority': priority, 'status': status}), 200
+        # , 'created_date': created_date, 'modified_by': modified_by, 'modified_date': modified_date, 'file_path': file_path}), 200
 
     except Exception as e:
+        print(f"{str(e)}")
         return jsonify({'status': 'error', 'message': str(e)}), 500

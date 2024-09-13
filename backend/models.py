@@ -30,8 +30,8 @@ class Grievance(db.Model):
     student_id = db.Column(db.Integer, nullable=False)
     category = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(50), nullable=True) 
-    sentiment = db.Column(db.String(50), nullable=True)  # New field for sentiment
+    status = db.Column(db.String(50), nullable=False) 
+    sentiment = db.Column(db.String(50), nullable=False)  # New field for sentiment
     priority = db.Column(db.String(50), nullable=True)
     file_path = db.Column(db.String(255), nullable=True)
     created_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
@@ -39,7 +39,7 @@ class Grievance(db.Model):
     modified_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
     modified_by = db.Column(db.String(100), nullable=True)
     
-    def __init__(self, student_id, category, description, status, sentiment=None, file_path=None, priority=True, created_date=True, created_by=True, modified_date=True, modified_by=True):
+    def __init__(self, student_id, category, description, status, sentiment, file_path=None, priority=True, created_date=None, created_by=None, modified_date=None, modified_by=None):
         self.student_id = student_id
         self.category = category
         self.description = description
@@ -51,4 +51,21 @@ class Grievance(db.Model):
         self.created_by = created_by
         self.modified_date = modified_date
         self.modified_by = modified_by
+        
+class Notification(db.Model):
+    __tablename__ = 'notifications'
+    notification_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    grievance_id = db.Column(db.Integer, nullable=False)
+    notification_text = db.Column(db.String(500), unique=True, nullable=False)
+    notification_type  = db.Column(db.String(50), nullable=False)
+    sent_date = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    created_by = db.Column(db.String(100), nullable=False)
+    created_date = db.Column(db.DateTime, default=db.func.current_timestamp())
+    modified_by = db.Column(db.String(100), nullable=False)
+    modified_date = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    
+    
+        
+
         

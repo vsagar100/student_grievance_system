@@ -19,8 +19,12 @@ def get_grievances():
                 'description': grievance.description,
                 'status': grievance.status,  # Assuming there's a 'status' column in the table
                 'sentiment': grievance.sentiment,
+                'priority': grievance.priority,
                 'file_path': grievance.file_path,
-                'created_at': grievance.created_date.strftime('%Y-%m-%d %H:%M:%S')
+                'created_by': grievance.created_by,
+                'created_date': grievance.created_date.strftime('%Y-%m-%d %H:%M:%S'),
+                'modified_by': grievance.modified_by,
+                'modified_date': grievance.modified_date.strftime('%Y-%m-%d %H:%M:%S')
             }
             for grievance in grievances
         ]
