@@ -41,6 +41,15 @@ const Sidebar = ({ isSidebarOpen, userRole, userName, userProfilePic }) => {
       { path: '/admin/support', label: 'Support', icon: faQuestionCircle },
     ];
   }
+  
+  const handleLogout = () => {
+    // Clear the session
+    localStorage.removeItem('token');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userProfilePic');
+    navigate('/signin'); // Redirect to SignIn page
+  };
 
   return (
     <div className={`sidebar ${isSidebarOpen ? 'open' : 'collapsed'}`}>
@@ -62,6 +71,12 @@ const Sidebar = ({ isSidebarOpen, userRole, userName, userProfilePic }) => {
             </Link>
           </li>
         ))}
+        <li>
+          <Link onClick={handleLogout} to='#'>
+            <FontAwesomeIcon icon={faUser} className="icon" />
+            <span className="menu-label">Logout</span>
+          </Link>
+        </li>
       </ul>
     </div>
   );

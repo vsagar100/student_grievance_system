@@ -1,35 +1,60 @@
-import React, { useState } from 'react';
-import '../styles/SignUp.css'; // Importing the CSS for styling
+import React, { useState, useContext } from 'react';
+import { GlobalContext } from '../GlobalState';
+import '../styles/SignUp.css'; 
 import SignupImage from '../assets/images/bg-02.png';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { useNavigate } from 'react-router-dom';
 
 const SignUp = () => {
+  const { BACKEND_API_URL } = useContext(GlobalContext);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     mobile: '',
     password: '',
+    role: '',
     confirmPassword: '',
     collegeId: null,
+    collegeName: '',
     termsAccepted: false,
   });
 
   const [errors, setErrors] = useState({});
-  const [isTermsModalOpen, setIsTermsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
-  // Form submission handler
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length === 0) {
-      // Form submission logic
-      console.log('Form submitted successfully');
+      try {
+        const data = new FormData();
+        data.append('fullName', formData.fullName);
+        data.append('email', formData.email);
+        data.append('mobile', formData.mobile);
+        data.append('password', formData.password);
+        data.append('role', 'student');// Hardcoded role as student
+        data.append('collegeId', formData.collegeId);
+        data.append('collegeName', formData.collegeName);  // For validating the college name
+
+        const response = await fetch(`${BACKEND_API_URL}/api/auth/signup`, {
+          method: 'POST',
+          body: data
+        });
+
+        const result = await response.json();
+        if (result.status === 'success') {
+          alert('User registered successfully!');
+          navigate('/signin');  // Redirect to sign-in page after successful registration
+        } else {
+          alert(result.message);
+        }
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      }
     }
   };
 
-  // Form validation
   const validateForm = () => {
     const errors = {};
     if (!formData.fullName.trim()) errors.fullName = 'Full Name is required';
@@ -42,48 +67,25 @@ const SignUp = () => {
     if (!formData.confirmPassword) errors.confirmPassword = 'Confirm Password is required';
     else if (formData.confirmPassword !== formData.password) errors.confirmPassword = 'Passwords do not match';
     if (!formData.collegeId) errors.collegeId = 'College ID is required';
+    if (!formData.collegeName) errors.collegeName = 'College Name is required';
     if (!formData.termsAccepted) errors.termsAccepted = 'You must accept the terms and conditions';
 
     return errors;
   };
 
-  // Form change handler
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // File change handler
   const handleFileChange = (e) => {
     setFormData({ ...formData, collegeId: e.target.files[0] });
-  };
-
-  // Toggle the terms modal
-  const toggleTermsModal = () => {
-    setIsTermsModalOpen(!isTermsModalOpen);
-  };
-
-  // Check if the form is valid for enabling the submit button
-  const isFormValid = () => {
-    return (
-      formData.fullName &&
-      formData.email &&
-      formData.mobile &&
-      formData.password &&
-      formData.confirmPassword &&
-      formData.collegeId &&
-      formData.termsAccepted
-    );
   };
 
   return (
     <div className="signup-container">
       <div className="signup-left">
-        <img
-          src={SignupImage}
-          alt="Signup Background"
-          className="signup-image"
-        />
+        <img src={SignupImage} alt="Signup Background" className="signup-image" />
       </div>
       <div className="signup-right">
         <form className="signup-form" onSubmit={handleSubmit}>
@@ -113,7 +115,6 @@ const SignUp = () => {
               onChange={handleChange}
             />
             {errors.email && <p className="error">{errors.email}</p>}
-            <small>Email will be OTP verified</small>
           </div>
 
           <div className="form-group">
@@ -127,7 +128,6 @@ const SignUp = () => {
               onChange={handleChange}
             />
             {errors.mobile && <p className="error">{errors.mobile}</p>}
-            <small>Mobile will be OTP verified</small>
           </div>
 
           <div className="form-group">
@@ -165,7 +165,19 @@ const SignUp = () => {
               onChange={handleFileChange}
             />
             {errors.collegeId && <p className="error">{errors.collegeId}</p>}
-            <small>Upload valid ID, it's validity will be verified.</small>
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="collegeName">College Name</label>
+            <input
+              type="text"
+              id="collegeName"
+              name="collegeName"
+              placeholder="Enter your College Name"
+              value={formData.collegeName}
+              onChange={handleChange}
+            />
+            {errors.collegeName && <p className="error">{errors.collegeName}</p>}
           </div>
 
           <div className="form-group checkbox-container">
@@ -177,43 +189,17 @@ const SignUp = () => {
               onChange={(e) => setFormData({ ...formData, termsAccepted: e.target.checked })}
             />
             <label htmlFor="termsAccepted">
-              I accept the <a href="#!" onClick={(e) => { e.preventDefault(); toggleTermsModal(); }}>terms and conditions</a>
+              I accept the <a href="#!" onClick={(e) => { e.preventDefault(); }}>terms and conditions</a>
             </label>
             {errors.termsAccepted && <p className="error">{errors.termsAccepted}</p>}
           </div>
 
           <div className="form-group">
-            <button type="submit" className="signup-btn" disabled={!isFormValid()}>Sign Up</button>
+            <button type="submit" className="signup-btn" disabled={!formData.termsAccepted}>Sign Up</button>
           </div>
 
-          <p className="login-link">
-            Already have an account? <a href="/signin">Sign In</a>
-          </p>
         </form>
       </div>
-
-      {/* Modal for Terms and Conditions */}
-      {isTermsModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <span className="close" onClick={toggleTermsModal}>&times;</span>
-            <h2>Terms and Conditions</h2>
-            <p>
-              Welcome to our Grievance Redressal System. By using our system, you agree to the following terms and conditions:
-            </p>
-            <ul>
-              <li><strong>Purpose:</strong> This system is intended for educational purposes, allowing students to file grievances and receive assistance.</li>
-              <li><strong>User Conduct:</strong> Users must use this system responsibly and ethically, refraining from submitting false or misleading information.</li>
-              <li><strong>Privacy:</strong> We are committed to protecting your privacy. Any personal information provided will be used solely for processing your grievance.</li>
-              <li><strong>Data Usage:</strong> Your data may be stored and analyzed to improve the efficiency of our grievance redressal process.</li>
-              <li><strong>Compliance with Indian Laws:</strong> All users must comply with relevant Indian laws, including the Information Technology Act and the Data Protection Act.</li>
-            </ul>
-            <p>
-              By using this system, you agree to abide by these terms and conditions. If you do not agree, please refrain from using the system.
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

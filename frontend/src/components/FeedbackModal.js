@@ -14,16 +14,6 @@ const FeedbackModal = ({ show, handleClose, type, message }) => {
       <div className={`feedback-modal ${modalColor}`}>
         <FontAwesomeIcon icon={icon} className="feedback-icon" />
         <p className="feedback-message">{message}</p>
-
-        {/* Placeholder image for success or error */}
-        <div className="image-placeholder">
-          {type === 'error' ? (
-            <img src={ErrorImage} alt="Error" />
-          ) : (
-            <img src={SuccessImage} alt="Success" />
-          )}
-        </div>
-
         <button onClick={handleClose} className="feedback-button">Close</button>
       </div>
     </Modal>

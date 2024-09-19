@@ -28,7 +28,15 @@ const StudentDashboard = () => {
   // Fetch grievances from the backend API
   const fetchGrievances = async () => {
     try {
-      const response = await fetch(`${BACKEND_API_URL}/api/grievances/get/all`);
+      // Get the JWT token from localStorage
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${BACKEND_API_URL}/api/grievances/get/all_cur_user`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`, // Send token in Authorization header
+                'Content-Type': 'application/json',
+            },
+        });
       const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         throw new Error('Response is not JSON');
@@ -48,6 +56,7 @@ const StudentDashboard = () => {
 
   // Handle grievance submission
   const handleGrievanceSubmit = async (formData) => {
+    console.log("handleGrievanceSubmit");
     setError(null);
     setMessage('');
     try {
@@ -194,6 +203,16 @@ const StudentDashboard = () => {
           <p><strong>Category:</strong> {selectedGrievance.category}</p>
           <p><strong>Description:</strong> {selectedGrievance.description}</p>
           <p><strong>Status:</strong> {selectedGrievance.status}</p>
+          {/* Display the uploaded file */}
+          
+          {selectedGrievance.file_path && (
+            <div className="grievance-file">
+            <p><strong>File:</strong> </p>
+              <a href={BACKEND_API_URL+selectedGrievance.file_path} target="_blank" rel="noopener noreferrer">
+                {selectedGrievance.file_path.split('/').pop()}  {/* Extracts and displays the file name */}
+              </a>
+          </div>
+          )}
         </div>
       ) : (
         <p>Loading grievance details...</p>

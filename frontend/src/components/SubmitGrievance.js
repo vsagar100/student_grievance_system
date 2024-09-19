@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
+import FeedbackModal from './FeedbackModal'; 
 
 const SubmitGrievance = ({ onSubmit, handleClose }) => {
+  const [student_id, setStudentId] = useState(null);
   const [category, setCategory] = useState('Academic');
   const [description, setDescription] = useState('');
   const [file, setFile] = useState(null);
   const [error, setError] = useState('');
+  const [feedback, setFeedback] = useState({ show: false, type: '', message: '' });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("handleSubmit");
     const formData = new FormData();
     formData.append('category', category);
     formData.append('description', description);
@@ -21,6 +25,7 @@ const SubmitGrievance = ({ onSubmit, handleClose }) => {
       handleClose(); // Close modal if submission is successful
     } catch (error) {
       setError('Failed to submit grievance');
+      showFeedback('error', 'Failed to submit grievance.'); // Show error feedback
     }
   };
 
